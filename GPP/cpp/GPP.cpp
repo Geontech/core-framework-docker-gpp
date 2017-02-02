@@ -1122,32 +1122,40 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
             prepend_args.push_back(waveform_name+"."+name_binding);
         }
     }
+    bool useDocker = false;
     if (tmp_params.find("__DOCKER_IMAGE__") != tmp_params.end()) {
         std::string image_name = tmp_params["__DOCKER_IMAGE__"].toString();
+    	LOG_DEBUG(GPP_i, __FUNCTION__ << "Component specified a Docker image: " << image_name);
 
         std::string target = GPP_i::find_exec("docker");
         if (!target.empty()) {
+        	useDocker = true;
+
+        	// Remove the ':' from the container name
+        	std::string container_name(component_id);
+        	std::replace(container_name.begin(), container_name.end(), ':', '-');
+
         	prepend_args.push_back(target);
         	prepend_args.push_back("run");
-        	prepend_args.push_back("-it"); // Since using /bin/bash -l -c prepend the executable
+        	prepend_args.push_back("--sig-proxy=true");
         	prepend_args.push_back("--rm");
         	prepend_args.push_back("--name");
-        	prepend_args.push_back(component_id);
+        	prepend_args.push_back(container_name);
         	prepend_args.push_back("--net=host");
         	prepend_args.push_back("-v");
         	prepend_args.push_back(docker_omniorb_cfg+":/etc/omniORB.cfg"); // Overload omniORB.cfg in the container
         	prepend_args.push_back("--volumes-from");
         	prepend_args.push_back("redhawk-fs");
+        	prepend_args.push_back("--volumes-from");
         	prepend_args.push_back("gnuradio-fs");
         	prepend_args.push_back(image_name);
-        	prepend_args.push_back("/bin/bash -l -c"); // Everything after this should be the command to execute
         	// FIXME: #maybe  What other Docker args do we need??  NUMA, if enabled?
         	LOG_DEBUG(GPP_i, __FUNCTION__ << "Component will launch within a Docker container using this image: " << image_name);
         }
     }
     CF::ExecutableDevice::ProcessID_Type ret_pid;
     try {
-        ret_pid = do_execute(name, options, tmp_params, prepend_args);
+        ret_pid = do_execute(name, options, tmp_params, prepend_args, useDocker);
         addProcess(ret_pid, app_id, component_id, reservation_value);
     } catch ( ... ) {
         throw;
@@ -1161,7 +1169,7 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
 /* execute *****************************************************************
     - executes a process on the device
 ************************************************************************* */
-CF::ExecutableDevice::ProcessID_Type GPP_i::do_execute (const char* name, const CF::Properties& options, const CF::Properties& parameters, const std::vector<std::string> prepend_args) throw (CORBA::SystemException, CF::Device::InvalidState, CF::ExecutableDevice::InvalidFunction, CF::ExecutableDevice::InvalidParameters, CF::ExecutableDevice::InvalidOptions, CF::InvalidFileName, CF::ExecutableDevice::ExecuteFail)
+CF::ExecutableDevice::ProcessID_Type GPP_i::do_execute (const char* name, const CF::Properties& options, const CF::Properties& parameters, const std::vector<std::string> prepend_args, const bool use_docker) throw (CORBA::SystemException, CF::Device::InvalidState, CF::ExecutableDevice::InvalidFunction, CF::ExecutableDevice::InvalidParameters, CF::ExecutableDevice::InvalidOptions, CF::InvalidFileName, CF::ExecutableDevice::ExecuteFail)
 {
     CF::Properties invalidOptions;
     std::string path;
@@ -1247,7 +1255,14 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::do_execute (const char* name, const 
         logFile += "/valgrind.%p.log";
         args.push_back(logFile);
     }
-    args.push_back(path);
+
+    if (use_docker) {
+    	// docker container will come up at its own $SDRROOT
+    	// 'name' is prefixed by /, so we prefix it with '.' here
+    	args.push_back("." + std::string(name));
+    } else {
+    	args.push_back(path);
+    }
 
     LOG_DEBUG(GPP_i, "Building param list for process " << path);
     for (CORBA::ULong i = 0; i < parameters.length(); ++i) {
@@ -1259,12 +1274,16 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::do_execute (const char* name, const 
 
     LOG_DEBUG(GPP_i, "Forking process " << path);
 
+    std::string full_command;
     std::vector<char*> argv(args.size() + 1, NULL);
     for (std::size_t i = 0; i < args.size(); ++i) {
         // const_cast because execv does not modify values in argv[].
         // See:  http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
         argv[i] = const_cast<char*> (args[i].c_str());
+        full_command.append(args[i] + " ");
     }
+
+    LOG_DEBUG(GPP_i, __FUNCTION__ << "Full command executed: " << full_command);
 
     rh_logger::LevelPtr  lvl = GPP_i::__logger->getLevel();
 
