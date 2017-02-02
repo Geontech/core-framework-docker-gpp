@@ -1,23 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-This file is protected by Copyright. Please refer to the COPYRIGHT file
-distributed with this source distribution.
-
-This file is part of REDHAWK GPP.
-
-REDHAWK GPP is free software: you can redistribute it and/or modify it under
-the terms of the GNU Lesser General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option) any
-later version.
-
-REDHAWK GPP is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
-details.
-
-You should have received a copy of the GNU Lesser General Public License along
-with this program.  If not, see http://www.gnu.org/licenses/.
--->
 <!DOCTYPE properties PUBLIC "-//JTRS//DTD SCA V2.2.2 PRF//EN" "properties.dtd">
 <properties>
   <simple id="DCE:cdc5ee18-7ceb-4ae6-bf4c-31f983179b4d" mode="readonly" name="device_kind" type="string">
@@ -69,15 +50,12 @@ with this program.  If not, see http://www.gnu.org/licenses/.
     <kind kindtype="execparam"/>
     <action type="external"/>
   </simple>
-
   <simple id="DCE:c80f6c5a-e3ea-4f57-b0aa-46b7efac3176" mode="readwrite" name="componentOutputLog" type="string">
     <description>If provided, all component output will be redirected to this file.  The GPP will not delete or rotate these logs.  The provided value may contain environment variables or reference component exec-params with @EXEC_PARAM@.  For example, this would be a valid value $SDRROOT/logs/@COMPONENT_IDENTIFIER@.log</description>
     <value></value>
     <kind kindtype="property"/>
     <action type="external"/>
   </simple>
-
-
   <struct id="nic_allocation" mode="readwrite" name="nic_allocation">
     <description>DCE:e4e86070-a121-45d4-a144-00386f2188e3</description>
     <simple id="nic_allocation::identifier" name="identifier" type="string">
@@ -200,7 +178,6 @@ Optional</description>
     </struct>
     <configurationkind kindtype="configure"/>
   </structsequence>
-
   <simple id="DCE:4e416acc-3144-47eb-9e38-97f1d24f7700" mode="readwrite" name="mcastnicInterface" type="string">
     <description>The Multicast NIC interface associated with this GPP (e.g. eth1).  If not provided no multicast allocations are permitted.</description>
     <value></value>
@@ -251,7 +228,6 @@ Optional</description>
     <kind kindtype="event"/>
     <action type="external"/>
   </simple>
-
   <simple id="DCE:89be90ae-6a83-4399-a87d-5f4ae30ef7b1" mode="readwrite" name="mcastnicThreshold" type="long">
     <description>Percentage of total Multicast NIC this GPP can use for capacity management</description>
     <value>80</value>
@@ -260,13 +236,11 @@ Optional</description>
     <kind kindtype="event"/>
     <action type="external"/>
   </simple>
-
   <simplesequence id="DCE:65544aad-4c73-451f-93de-d4d76984025a" mode="readwrite" name="mcastnicVLANs" type="long">
     <description>When queired, returns the list of vlans on this host.  When used as an allocation, defines the list of VLANS the component requires.</description>
     <kind kindtype="allocation"/>
     <action type="external"/>
   </simplesequence>
-
   <struct id="advanced" mode="readwrite">
     <simple id="maximum_throughput_percentage" type="double">
       <value>80.0</value>
@@ -296,7 +270,6 @@ Optional</description>
     </struct>
     <configurationkind kindtype="configure"/>
   </structsequence>
-
   <struct id="threshold_event" mode="readonly">
     <simple id="threshold_event::source_id" name="source_id" type="string">
       <description>Identifier of component or device that generated this message</description>
@@ -331,7 +304,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </simple>
     <configurationkind kindtype="message"/>
   </struct>
-
   <simple id="threshold_cycle_time" mode="readwrite" name="threshold_cycle_time" type="ulong">
     <description>cycle time between updates of metric capture, calculations and threshold evaluations.</description>
     <value>500</value>
@@ -339,14 +311,12 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     <kind kindtype="property"/>
     <action type="external"/>
   </simple>
-
   <simple id="busy_reason" mode="readonly" name="busy_reason" type="string">
     <description>Report reason why the GPP had it's usage state set to BUSY.</description>
     <value></value>
     <kind kindtype="property"/>
     <action type="external"/>
   </simple>
-
   <struct id="thresholds" mode="readwrite">
     <description>The thresholds that cause a failure for allocations</description>
     <simple id="cpu_idle" type="float">
@@ -389,7 +359,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </simple>
     <configurationkind kindtype="property"/>
   </struct>
-
   <simple id="DCE:6565bffd-cb09-4927-9385-2ecac68035c7" mode="readonly" name="memFree" type="longlong">
     <description>Amount of RAM in the GPP not in use (measured)</description>
     <units>MiB</units>
@@ -435,7 +404,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     <kind kindtype="event"/>
     <action type="external"/>
   </simple>
-
   <struct id="DCE:9da85ebc-6503-48e7-af36-b77c7ad0c2b4" mode="readonly" name="loadAverage">
     <description>The current load average, as reported by /proc/loadavg.  Each core on a computer can have a load average between 0.0 and 1.0.  This differs greatly from CPU percentage (as reported by top).  Load averages differ in two significant ways: 1) they measure the trend of CPU utlization, and 2) they include all demand for the CPU not only how much was active at the time of measurement.  Load averages do not include any processes or threads waiting on I/O, networking, databases, or anything else not demanding the CPU.</description>
     <simple id="onemin" mode="readwrite" name="onemin" type="double">
@@ -453,24 +421,20 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     <configurationkind kindtype="configure"/>
     <configurationkind kindtype="event"/>
   </struct>
-
-  <simple id="reserved_capacity_per_component" name="reserved_capacity_per_component" mode="readwrite" type="float">
+  <simple id="reserved_capacity_per_component" mode="readwrite" name="reserved_capacity_per_component" type="float">
     <value>0.1</value>
     <kind kindtype="configure"/>
     <action type="external"/>
   </simple>
-
   <simple id="processor_cores" mode="readonly" type="short">
     <kind kindtype="configure"/>
     <action type="external"/>
   </simple>
-
   <simple id="processor_monitor_list" mode="readonly" type="string">
     <description>list of cpu ids that are being monitored for loadavg and idle utilization.</description>
     <kind kindtype="configure"/>
     <action type="external"/>
   </simple>
-
   <struct id="gpp_limits" mode="readonly">
     <simple id="current_threads" type="long">
       <description>The current number of threads for the GPP</description>
@@ -486,7 +450,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </simple>
     <configurationkind kindtype="property"/>
   </struct>
-
   <struct id="sys_limits" mode="readonly">
     <simple id="sys_limits::current_threads" name="current_threads" type="long">
       <description>The current number of threads running on the system</description>
@@ -502,7 +465,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </simple>
     <configurationkind kindtype="property"/>
   </struct>
-  
   <structsequence id="utilization" mode="readonly">
     <struct id="utilization_entry">
       <simple id="description" type="string"/>
@@ -513,8 +475,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </struct>
     <configurationkind kindtype="property"/>
   </structsequence>
-
-
   <structsequence id="component_monitor" mode="readonly">
     <struct id="component_monitor::component_monitor" name="component_monitor">
       <simple id="component_monitor::component_monitor::component_id" name="component_id" type="string"/>
@@ -535,8 +495,6 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </struct>
     <configurationkind kindtype="property"/>
   </structsequence>
-
-
   <struct id="affinity" mode="readwrite">
     <simple id="affinity::exec_directive_value" mode="readwrite" name="exec_directive_value" type="string" optional="false">
       <description>The context specification for the exec_directive_class.   See numa library manpage for socket(numa node) and cpu list specifications.  For cgroup/cpuset option then a pre-existing cgroup name is required.</description>
@@ -582,6 +540,10 @@ THRESHOLD_NOT_EXCEEDED:  The measured value no longer exceeds the configured thr
     </simple>
     <configurationkind kindtype="property"/>
   </struct>
-
-
+  <simple id="docker_omniorb_cfg" mode="readonly" type="string">
+    <description>Absolute path to the omniORB configuration file that will be provided to the docker images being launched (if any).</description>
+    <value>/etc/omniORB.cfg</value>
+    <kind kindtype="property"/>
+    <action type="external"/>
+  </simple>
 </properties>
