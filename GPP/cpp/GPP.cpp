@@ -1144,12 +1144,21 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
         	prepend_args.push_back("--net=host");
         	prepend_args.push_back("-v");
         	prepend_args.push_back(docker_omniorb_cfg+":/etc/omniORB.cfg"); // Overload omniORB.cfg in the container
-        	prepend_args.push_back("--volumes-from");
-        	prepend_args.push_back("redhawk-fs");
-        	prepend_args.push_back("--volumes-from");
-        	prepend_args.push_back("gnuradio-fs");
+
+        	// Additional arguments
+        	if (tmp_params.find("__DOCKER_ARGS__") != tmp_params.end()) {
+        		std::string docker_args_raw = tmp_params["__DOCKER_ARGS__"].toString();
+                std::vector<std::string> docker_args;
+                boost::split(docker_args, docker_args_raw, boost::is_any_of(" ") );
+                BOOST_FOREACH( const std::string& arg, docker_args ) {
+                	prepend_args.push_back(arg);
+                }
+        	}
+//        	prepend_args.push_back("--volumes-from");
+//        	prepend_args.push_back("redhawk-fs");
+//        	prepend_args.push_back("--volumes-from");
+//        	prepend_args.push_back("gnuradio-fs");
         	prepend_args.push_back(image_name);
-        	// FIXME: #maybe  What other Docker args do we need??  NUMA, if enabled?
         	LOG_DEBUG(GPP_i, __FUNCTION__ << "Component will launch within a Docker container using this image: " << image_name);
         }
     }
