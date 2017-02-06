@@ -1154,10 +1154,6 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
                 	prepend_args.push_back(arg);
                 }
         	}
-//        	prepend_args.push_back("--volumes-from");
-//        	prepend_args.push_back("redhawk-fs");
-//        	prepend_args.push_back("--volumes-from");
-//        	prepend_args.push_back("gnuradio-fs");
         	prepend_args.push_back(image_name);
         	LOG_DEBUG(GPP_i, __FUNCTION__ << "Component will launch within a Docker container using this image: " << image_name);
         }
