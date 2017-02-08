@@ -1129,7 +1129,31 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
 
         std::string target = GPP_i::find_exec("docker");
         if (!target.empty()) {
-        	useDocker = true;
+        	// Verify the image exists
+        	char buffer[128];
+        	std::string result = "";
+        	std::string docker_query = target + " images -q " + image_name;
+        	FILE* pipe = popen(docker_query.c_str(), "r");
+        	if (!pipe)
+        		throw CF::ExecutableDevice::ExecuteFail(CF::CF_EINVAL, "Could not run popen");
+        	try {
+        		while (!feof(pipe)) {
+        			if (fgets(buffer, 128, pipe) != NULL) {
+        				result += buffer;
+        			}
+        		}
+        	} catch (...) {
+        		pclose (pipe);
+        		throw;
+        	}
+        	pclose(pipe);
+        	if (result.empty()) {
+        		CF::Properties invalidParameters;
+        		invalidParameters.length(invalidParameters.length() + 1);
+        		invalidParameters[invalidParameters.length() - 1].id = "__DOCKER_IMAGE__";
+        		invalidParameters[invalidParameters.length() - 1].value <<= image_name.c_str();
+        		throw CF::ExecutableDevice::InvalidParameters(invalidParameters);
+        	}
 
         	// Remove the ':' from the container name
         	std::string container_name(component_id);
@@ -1154,8 +1178,12 @@ CF::ExecutableDevice::ProcessID_Type GPP_i::execute (const char* name, const CF:
                 	prepend_args.push_back(arg);
                 }
         	}
+
+        	// Finally, the image name
         	prepend_args.push_back(image_name);
         	LOG_DEBUG(GPP_i, __FUNCTION__ << "Component will launch within a Docker container using this image: " << image_name);
+
+        	useDocker = true;
         }
     }
     CF::ExecutableDevice::ProcessID_Type ret_pid;
